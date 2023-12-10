@@ -30,7 +30,7 @@ def clip(content):
         all references as they are not necessary for summarization
     '''
     loc_intro = content.find("Introduction")
-    loc_refer = content.rfind("Reference")
+    loc_refer = content.rfind("References")
     if loc_intro !=-1:
         if loc_refer !=-1:
             content = content[loc_intro:loc_refer]
@@ -90,10 +90,12 @@ def run(search_query):
     content = strip(page_content)
     sent = chunk(content)
     summarized = summarize(sent)
+    
 
     print(metadata['Published'])
     print(metadata['Title'])
     print(metadata['Authors'])
+    print(summarized)
 
 if __name__ == '__main__':
 
