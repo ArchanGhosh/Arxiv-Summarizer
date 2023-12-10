@@ -92,10 +92,10 @@ def run(search_query):
     summarized = summarize(sent)
     
 
-    print(metadata['Published'])
-    print(metadata['Title'])
-    print(metadata['Authors'])
-    print(summarized)
+    print(f"Published : {metadata['Published']} ")
+    print(f"Title : {metadata['Title']} ")
+    print(f"Authors : {metadata['Authors']}")
+    print(f"Summarised Text : {summarized}")
 
 if __name__ == '__main__':
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
     print("Please Provide a Arxiv Index number or Paper Title as free text search to fetch paper")
     print("Warning: Free Text Search is not always accurate") 
     search_query = input("Enter here: ")
-    print(search_query)
-
+    # print(search_query)
+    print("Paper fetched begining text summarisation")
     #search_query = "MTTN"
     run(search_query) 
