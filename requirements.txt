@@ -1,0 +1,4 @@
+transformers
+langchain
+numpy
+torch
