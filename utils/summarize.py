@@ -1,4 +1,5 @@
-import model_selector
+from model_selector import model_selector
+from transformers import pipeline
 
 def summarize(sent):
     ''' This is the main function that summarizes the contents of the paper. Model is initialized automatically based on CUDA availability.
@@ -6,7 +7,6 @@ def summarize(sent):
     tokenizer_str, model_str = model_selector()
 
     summarizer = pipeline("summarization", model=model_str, tokenizer = tokenizer_str)
-
 
     summarized = ""
     for i in sent:
