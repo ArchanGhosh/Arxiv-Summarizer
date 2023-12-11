@@ -1,3 +1,5 @@
+
+
 def chunk(content):
     '''We are currently using a manual chunking method that combines 10 sentences at one time.
         Since the model context length is around 512 we are assume that 10 sentences would create a context length of that is between 600+-100
