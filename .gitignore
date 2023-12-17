@@ -162,3 +162,7 @@ cython_debug/
 
 # folders
 /venv
+
+# Hidden Files & Directories
+.*
+
