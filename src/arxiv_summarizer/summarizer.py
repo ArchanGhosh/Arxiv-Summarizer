@@ -4,7 +4,7 @@ from transformers import pipeline
 # from tqdm import tqdm
 
 from .utils import doc_loader, strip, chunk
-from .definition_overloading import MultipleMeta
+# from .definition_overloading import MultipleMeta
 
 class SummarizationModel:
     """Summarization model for generating summaries.
@@ -29,8 +29,8 @@ class SummarizationModel:
         num_workers = kwargs.pop("num_workers", None)
         piped_model = pipeline("summarization", model=model, tokenizer=tokenizer, batch_size=batch_size, num_workers=num_workers)
 
-        max_length = kwargs.pop("max_length", None)
-        min_length = kwargs.pop("min_length", None)
+        max_length = kwargs.pop("max_length", 10240)
+        min_length = kwargs.pop("min_length", 1024)
         do_sample  = kwargs.pop("do_sample", False)
 
         truncation = kwargs.pop("truncation", None)
@@ -82,11 +82,11 @@ class SummarizationModel:
             from tqdm import tqdm
 
         for data in tqdm(text, unit = "sentence"):
+            __data__ = data
             for layer in self.model:
-                result.append(
-                    layer(
+                    __data__ = layer(
                             (
-                                data,
+                                __data__,
                                 {
                                     "max_length": min(self.kwargs["max_length"], len(data)),            # At most, the size of the input text
                                     "min_length": min(self.kwargs["min_length"], (len(data) * 2) // 3), # At most 66.6% of the size of the input text
@@ -98,7 +98,9 @@ class SummarizationModel:
                                 }
                             )
                     )
-                )
+            result.append(
+                __data__
+            )
 
         return result
 
@@ -116,21 +118,21 @@ class ArxivSummarizer:
         ```python
         summarizer_model = SummarizationModel(model="Falconsai/text_summarization", tokenizer="Falconsai/text_summarization", max_length=256)
         arxiv_summarizer = ArxivSummarizer(summarizer=summarizer_model)
-        summary = arxiv_summarizer(arxiv_id="1234567890")
+        summary = arxiv_summarizer(arxiv_id="1234.6789")
         ```
 
         2. Using a pre-trained model by name:
 
         ```python
         arxiv_summarizer = ArxivSummarizer(model="facebook/bart-large-cnn", max_length=256)
-        summary = arxiv_summarizer(arxiv_id="1234567890")
+        summary = arxiv_summarizer(arxiv_id="1234.6789")
         ```
 
         3. Using default models based on GPU availability:
 
         ```python
         arxiv_summarizer = ArxivSummarizer()
-        summary = arxiv_summarizer(arxiv_id="1234567890")
+        summary = arxiv_summarizer(arxiv_id="1234.6789")
         ```
         
     Args:

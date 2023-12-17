@@ -8,6 +8,7 @@ The `ArxivSummarizer` is a Python class designed for summarizing ArXiv documents
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
+    - [As CLI](#as-cli)
     - [With Custom SummarizationModel](#with-custom-summarizationmodel)
     - [With Pre-trained Model by Name](#with-pre-trained-model-by-name)
     - [With Default Models](#with-default-models)
@@ -24,6 +25,14 @@ pip install .
 ```
 
 ## Usage
+
+### As CLI
+
+Arxiv Summarizer can be easily used as a CLI tool to get papers summarized... 
+
+```sh
+$ python3 -m arxiv_summarizer 1234.56789v1
+```
 
 ### With Custom SummarizationModel
 
