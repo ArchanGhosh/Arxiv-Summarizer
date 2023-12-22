@@ -113,19 +113,8 @@ class ArxivAPIWrapper(BaseModel):
                     query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=self.top_k_results
                 ).results()
         except self.arxiv_exceptions as ex:
-            return [Document(page_content=f"Arxiv exception: {ex}")]
-        # docs = [
-        #     Document(
-        #         page_content=result.summary,
-        #         metadata={
-        #             "entry_id": result.entry_id,
-        #             "Published": result.updated.date(),
-        #             "Title": result.title,
-        #             "Authors": ", ".join(a.name for a in result.authors),
-        #         },
-        #     )
-        #     for result in results
-        # ]
+            raise Exception(f"Arxiv exception: {ex}")
+
         return results
 
     def run(self, query: str) -> str:
