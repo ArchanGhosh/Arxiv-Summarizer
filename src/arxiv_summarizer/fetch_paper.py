@@ -99,12 +99,14 @@ def fetch_paper(query, max_docs = 1) -> Iterator[ArxivPaper]:
         UserWarning: If a paper cannot be fetched (possibly withdrawn), a warning is issued.
 
     Example:
-        ```python
-        papers = fetch_paper("machine learning", max_docs=5)
-        for paper in papers:
-            print(paper.name, paper.authors, paper.published)
-        ```
+        .. code-block:: python
 
+            from arxiv_summarizer.fetch_paper import fetch_paper
+
+            papers = fetch_paper("machine learning", max_docs=5)
+            for paper in papers:
+                print(paper.name, paper.authors, paper.published)
+        
     """    
     query = query.lower()
 
@@ -118,6 +120,7 @@ def fetch_paper(query, max_docs = 1) -> Iterator[ArxivPaper]:
     client = ArxivAPIWrapper(
         doc_content_chars_max = None, 
         top_k_results = max_docs, 
+        load_max_docs = max_docs,
         load_all_available_meta = True
     )
 
