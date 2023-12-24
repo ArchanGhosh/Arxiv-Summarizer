@@ -49,7 +49,7 @@ setup(
 
         # ML
         "transformers", # For Transformer models
-        "gradio",       # For Web Interface
+        #"gradio",       # For Web Interface
         "torch==2.1.2", # For Machine Learning
 
         # CLI
