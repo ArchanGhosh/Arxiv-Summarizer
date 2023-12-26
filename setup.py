@@ -77,9 +77,9 @@ setup(
     },
     classifiers=[
         # License
-        "License :: OSI Approved :: GNU Affero General Public License v3",
+        "License :: OSI Approved :: Apache Software License",
         # Project Maturity
-        "Development Status :: 1 - Planning",
+        "Development Status :: 3 - Alpha",
         # Topic
         "Topic :: Communications",
         # Intended Audience
@@ -88,12 +88,16 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
+        #Environment
+        "Environment :: Console",
+        "Environment :: GPU",
+        
         # Python Version
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        #"Programming Language :: Python :: 3",
+        #"Programming Language :: Python :: 3.4",
+        #"Programming Language :: Python :: 3.5",
+        #"Programming Language :: Python :: 3.6",
+        #"Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
