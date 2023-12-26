@@ -21,6 +21,12 @@ The `ArxivSummarizer` is a Python class designed for summarizing ArXiv documents
 
 Make sure you have Python 3.8 or later installed. Install the required dependencies using the following command:
 
+You can use Arxiv Summarizer by simply doing
+```bash
+pip install arxiv-summarizer
+```
+
+For developers looking to tinker you can simply `git clone` this repository and use:
 ```bash
 pip install .
 ```
