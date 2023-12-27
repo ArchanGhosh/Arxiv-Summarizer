@@ -25,10 +25,10 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     include_package_data=True,
-    py_modules=['__main__'],
+    py_modules=["__main__"],
     entry_points={
-        'console_scripts': [
-            'arxiv_summarizer = arxiv_summarizer.__main__:cli',
+        "console_scripts": [
+            "arxiv_summarizer = arxiv_summarizer.__main__:cli",
         ],
     },
     # cmdclass={"build_sphinx": BuildDoc},
@@ -43,21 +43,19 @@ setup(
     },
     install_requires=[
         # Arxiv & PDF
-        "langchain",    # For loading Arxiv PDFs
-        "arxiv",        # `langchain` dependency
-        "pymupdf",      # `langchain` dependency
-
+        "langchain",  # For loading Arxiv PDFs
+        "arxiv",  # `langchain` dependency
+        "pymupdf",  # `langchain` dependency
         # ML
-        "transformers", # For Transformer models
-        #"gradio",       # For Web Interface
-        "torch==2.1.2", # For Machine Learning
-
+        "transformers",  # For Transformer models
+        "torch==2.1.2",  # For Machine Learning
         # CLI
-        "click",        # For CLI arguments
-        "rich",         # For Rich Text in CLI
-
+        "click",  # For CLI arguments
+        "rich",  # For Rich Text in CLI
         # Tests
-        "pytest",       # For Unit Tests
+        "pytest",  # For Unit Tests
+        # Linting
+        "nox",  # Formatting, Linting and Testing Automation
     ],
     extras_require={
         "dev": [
@@ -88,16 +86,15 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
-        #Environment
+        # Environment
         "Environment :: Console",
         "Environment :: GPU",
-        
         # Python Version
-        #"Programming Language :: Python :: 3",
-        #"Programming Language :: Python :: 3.4",
-        #"Programming Language :: Python :: 3.5",
-        #"Programming Language :: Python :: 3.6",
-        #"Programming Language :: Python :: 3.7",
+        # "Programming Language :: Python :: 3",
+        # "Programming Language :: Python :: 3.4",
+        # "Programming Language :: Python :: 3.5",
+        # "Programming Language :: Python :: 3.6",
+        # "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",

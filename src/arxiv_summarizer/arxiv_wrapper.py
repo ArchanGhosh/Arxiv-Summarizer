@@ -13,12 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 class ArxivAPIWrapper(BaseModel):
-    """This is the same wrapper file from langchain with 2 extra implementations. You can find the additions at 
-       https://github.com/langchain-ai/langchain/pull/14915
-       https://github.com/langchain-ai/langchain/pull/14953
+    """This is the same wrapper file from langchain with 2 extra implementations. You can find the additions at
+    https://github.com/langchain-ai/langchain/pull/14915
+    https://github.com/langchain-ai/langchain/pull/14953
 
-       Once these are published in the new version of langchain we will remove this wrapper and use the native
+    Once these are published in the new version of langchain we will remove this wrapper and use the native
     """
+
     """Wrapper around ArxivAPI.
 
     To use, you should have the ``arxiv`` python package installed.
@@ -155,7 +156,7 @@ class ArxivAPIWrapper(BaseModel):
         else:
             return "No good Arxiv Result was found"
 
-    def load(self, query: str) -> List[Document]:
+    def load(self, query: str, offset: int = 0) -> List[Document]:
         """
         Run Arxiv search and get the article texts plus the article meta information.
         See https://lukasschwab.me/arxiv.py/index.html#Search

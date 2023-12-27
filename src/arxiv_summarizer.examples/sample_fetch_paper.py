@@ -1,24 +1,28 @@
-from rich.progress import Progress
+from typing import List
+
 from rich.console import Console
+from rich.progress import Progress
 from rich.table import Table
 
-from typing import List
-from arxiv_summarizer.fetch_paper import fetch_paper, ArxivPaper
-
+from arxiv_summarizer.fetch_paper import ArxivPaper, fetch_paper
 
 if __name__ == "__main__":
     papers = fetch_paper("Yoshua Bengio", max_docs=15)
 
-    results : List[ArxivPaper] = [paper for paper in papers]
+    results: List[ArxivPaper] = [paper for paper in papers]
 
     print(f"{len(results)} Papers Found !!!")
 
     with Progress() as progress:
-        task = progress.add_task("[cyan] Downloading content...", total = len(results))
+        task = progress.add_task("[cyan] Downloading content...", total=len(results))
 
         for index, paper in enumerate(results):
-            progress.update(task, advance=1, description=f"Downloading content for paper {paper.arxiv_id}")
-            c = results[index].content # This will download the content automatically.
+            progress.update(
+                task,
+                advance=1,
+                description=f"Downloading content for paper {paper.arxiv_id}",
+            )
+            c = results[index].content  # This will download the content automatically.
 
     console = Console()
 
@@ -29,7 +33,12 @@ if __name__ == "__main__":
     table.add_column("Content Size", style="dim")
 
     for entry in results:
-        entry:ArxivPaper
-        table.add_row(entry.arxiv_id, entry.name, ", ".join(entry.authors), str(len(entry.content)))
+        entry: ArxivPaper
+        table.add_row(
+            entry.arxiv_id,
+            entry.name,
+            ", ".join(entry.authors),
+            str(len(entry.content)),
+        )
 
     console.print(table)

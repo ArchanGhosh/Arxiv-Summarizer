@@ -1,15 +1,22 @@
+import warnings
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Tuple, Iterator
-from urllib.request import urlretrieve
 from tempfile import NamedTemporaryFile
-import warnings
+from typing import Iterator, List, Tuple
+from urllib.request import urlretrieve
+
+from arxiv.arxiv import Result
+from langchain.document_loaders import ArxivLoader
 
 from arxiv_summarizer.arxiv_wrapper import ArxivAPIWrapper
+from arxiv_summarizer.exceptions import (
+    ArxivDocumentWithdrawn,
+    ArxivQueryReturnedEmpty,
+    FalseArxivId,
+    InvalidArxivId,
+)
 from arxiv_summarizer.utils import is_arxiv_identifier
-from arxiv_summarizer.exceptions import FalseArxivId, InvalidArxivId, ArxivDocumentWithdrawn, ArxivQueryReturnedEmpty
-from langchain.document_loaders import ArxivLoader 
-from arxiv.arxiv import Result
+
 
 @dataclass(slots=True)
 class ArxivPaper:
@@ -26,11 +33,12 @@ class ArxivPaper:
     doi: str
 
     # content: str
-    _content: int = field(repr=False, init=False, default = None)
-
+    _content: int = field(repr=False, init=False, default=None)
 
     @property
-    def content(self, ) -> str:
+    def content(
+        self,
+    ) -> str:
         if self._content:
             return self._content
 
@@ -42,40 +50,44 @@ class ArxivPaper:
                 "`pip install pymupdf`"
             )
 
-        with NamedTemporaryFile(mode = "r", delete = True, prefix="arxiv_", suffix=".pdf") as arxiv_pdf:
+        with NamedTemporaryFile(
+            mode="r", delete=True, prefix="arxiv_", suffix=".pdf"
+        ) as arxiv_pdf:
             try:
                 doc_file_name, msg = urlretrieve(self.pdf_url, arxiv_pdf.name)
                 with fitz.open(doc_file_name) as doc_file:
                     self._content: str = "".join(page.get_text() for page in doc_file)
             except:
-                warnings.warn(f"Cannot fetch arxiv:{self.arxiv_id}. Possibly withdrawn.")
+                warnings.warn(
+                    f"Cannot fetch arxiv:{self.arxiv_id}. Possibly withdrawn."
+                )
                 self._content = None
                 return None
 
         return self._content
-    
+
     @staticmethod
     def from_result(result: Result):
         paper = ArxivPaper(
-            arxiv_id = result.entry_id.split("/")[-1],
-            name = result.title,
-            authors = [
-                author.name for author in result.authors
+            arxiv_id=result.entry_id.split("/")[-1],
+            name=result.title,
+            authors=[author.name for author in result.authors],
+            summary=result.summary,
+            published=result.published,
+            primary_category=result.primary_category,
+            categories=result.categories,
+            pdf_url=result.pdf_url,
+            links=[
+                (link.title, link.href, link.rel, link.content_type)
+                for link in result.links
             ],
-            summary = result.summary,
-            published = result.published,
-            primary_category = result.primary_category,
-            categories = result.categories,
-            pdf_url = result.pdf_url,
-            links = [
-                (link.title, link.href, link.rel, link.content_type) for link in result.links
-            ],
-            journal_ref = result.journal_ref,
-            doi = result.doi
+            journal_ref=result.journal_ref,
+            doi=result.doi,
         )
         return paper
 
-def fetch_paper(query, max_docs = 1) -> Iterator[ArxivPaper]:
+
+def fetch_paper(query, max_docs=1) -> Iterator[ArxivPaper]:
     """Fetches ArXiv papers based on the given query.
 
     Args:
@@ -108,33 +120,28 @@ def fetch_paper(query, max_docs = 1) -> Iterator[ArxivPaper]:
             papers = fetch_paper("machine learning", max_docs=5)
             for paper in papers:
                 print(paper.name, paper.authors, paper.published)
-        
-    """    
+
+    """
     query = query.lower()
 
-    # TODO: This check won't be necessary anymore, as the "content" 
+    # TODO: This check won't be necessary anymore, as the "content"
     # is now being fetched, only when needed.
-    if (max_docs > 50):
+    if max_docs > 50:
         warnings.warn("Max docs exceeded 50, defaulting to 50 documents only")
 
     max_docs = min(50, max_docs)
 
     client = ArxivAPIWrapper(
-        doc_content_chars_max = None, 
-        top_k_results = max_docs, 
-        load_max_docs = max_docs,
-        load_all_available_meta = True
+        doc_content_chars_max=None,
+        top_k_results=max_docs,
+        load_max_docs=max_docs,
+        load_all_available_meta=True,
     )
 
-    results = client.get_summaries_as_docs(query = query)
+    results = client.get_summaries_as_docs(query=query)
 
     try:
         for res in results:
             yield ArxivPaper.from_result(res)
     except AttributeError:
         pass
-
-
-
-        
-
