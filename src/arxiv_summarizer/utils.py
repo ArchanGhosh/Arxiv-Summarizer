@@ -1,3 +1,5 @@
+import re
+from transformers import pipeline
 from arxiv_summarizer.exceptions import InvalidArxivId, FalseArxivId, ArxivDocumentWithdrawn
 
 def chunk(content):
@@ -38,17 +40,6 @@ def clip(content):
     else:
         print("Warning: Paper Doesn't Have an Introduction Title, these may lead to overlap of summarization")
 
-from langchain.document_loaders import ArxivLoader 
-
-def doc_loader(search_query):
-    '''The purpose of this function is to load the documents from Arxiv'''
-    '''We are using the Arxiv Loader under Langchain library, which intern invokes the Arxiv API'''
-
-    docs = ArxivLoader(query=search_query, load_max_docs=1).load()
-    if len(docs) == 0:
-        raise FalseArxivId(f"Cannot find the arxiv id `{search_query}`")
-    return docs[0].metadata, docs[0].page_content
-
 import torch
 
 def model_selector():
@@ -73,8 +64,6 @@ def strip(content):
 
     return content
 
-from transformers import pipeline
-
 def summarize(sent):
     ''' This is the main function that summarizes the contents of the paper. Model is initialized automatically based on CUDA availability.
     '''
@@ -89,6 +78,18 @@ def summarize(sent):
 
     return summarized
 
-
+def is_arxiv_identifier(query: str, raise_exception:bool = False) -> bool:
+    """Check if a query is an arxiv identifier."""
+    arxiv_identifier_pattern = r"\d{2}(0[1-9]|1[0-2])\.\d{4,5}(v\d+|)|\d{7}.*"
+    for query_item in query.split():
+        match_result = re.match(arxiv_identifier_pattern, query_item)
+        if not match_result:
+            if raise_exception:
+                raise InvalidArxivId(f"Not a valid arxiv id `{query}`")
+            return False
+        assert match_result is not None
+        if not match_result.group(0) == query_item:
+            return False
+    return True
 
 

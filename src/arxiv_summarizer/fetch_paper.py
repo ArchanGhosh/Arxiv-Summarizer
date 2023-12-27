@@ -6,6 +6,8 @@ from tempfile import NamedTemporaryFile
 import warnings
 
 from arxiv_summarizer.arxiv_wrapper import ArxivAPIWrapper
+from arxiv_summarizer.utils import is_arxiv_identifier
+from arxiv_summarizer.exceptions import FalseArxivId, InvalidArxivId, ArxivDocumentWithdrawn, ArxivQueryReturnedEmpty
 from langchain.document_loaders import ArxivLoader 
 from arxiv.arxiv import Result
 
@@ -126,8 +128,11 @@ def fetch_paper(query, max_docs = 1) -> Iterator[ArxivPaper]:
 
     results = client.get_summaries_as_docs(query = query)
 
-    for res in results:
-        yield ArxivPaper.from_result(res)
+    try:
+        for res in results:
+            yield ArxivPaper.from_result(res)
+    except AttributeError:
+        pass
 
 
 

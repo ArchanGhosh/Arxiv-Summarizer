@@ -1,10 +1,11 @@
+from typing import List, Tuple, AnyStr
 import torch
 from transformers import pipeline
 
-# from tqdm import tqdm
+from arxiv_summarizer.utils import strip, chunk, is_arxiv_identifier
+from arxiv_summarizer.fetch_paper import fetch_paper, ArxivPaper
+from arxiv_summarizer.exceptions import FalseArxivId, ArxivDocumentWithdrawn, ArxivQueryReturnedEmpty 
 
-from .utils import doc_loader, strip, chunk
-# from .definition_overloading import MultipleMeta
 
 class SummarizationModel:
     """Summarization model for generating summaries.
@@ -176,16 +177,30 @@ class ArxivSummarizer:
                 early_stopping=True,
             )
 
-    def __call__(self, arxiv_id=None):
+    def __call__(self, arxiv_id:str) -> Tuple[ArxivPaper, AnyStr]:
         """Generate a summary for the specified ArXiv document.
 
         Args:
-            arxiv_id (str, optional): The ArXiv document ID. Defaults to None.
+            arxiv_id (str): The ArXiv identifier or search query for the document.
+
+        Raises:
+            FalseArxivId: Raised when the provided arxiv identifier `arxiv_id` is not found.
+            ArxivQueryReturnedEmpty: Raised when the arxiv query `arxiv_id` returns no results.
+
 
         Returns:
-            str: The generated summary for the ArXiv document.
-        """        
-        metadata, page_content = doc_loader(arxiv_id)
-        content = strip(page_content)
+            Tuple[ArxivPaper, AnyStr]: A tuple containing an ArxivPaper object representing the fetched document and the generated summary.
+        """
+        # metadata, page_content = doc_loader(arxiv_id)
+        papers = list(fetch_paper(arxiv_id, max_docs=3))
+        if len(papers) == 0:
+            if is_arxiv_identifier(arxiv_id):
+                raise FalseArxivId(f"Cannot find the arxiv id `{arxiv_id}`")
+            else:
+                raise ArxivQueryReturnedEmpty(f"Cannot find any arxiv entry containing `{arxiv_id}`")
+
+        paper: ArxivPaper = papers[0]
+
+        content = strip(paper.content)
         sentence = chunk(content)
-        return metadata, self.model(sentence)
+        return (paper, self.model(sentence))

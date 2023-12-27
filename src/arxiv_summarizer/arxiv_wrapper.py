@@ -7,6 +7,8 @@ from typing import Any, Dict, List, Optional
 from langchain_core.documents import Document
 from langchain_core.pydantic_v1 import BaseModel, root_validator
 
+from arxiv_summarizer.utils import is_arxiv_identifier
+
 logger = logging.getLogger(__name__)
 
 
@@ -66,15 +68,8 @@ class ArxivAPIWrapper(BaseModel):
 
     def is_arxiv_identifier(self, query: str) -> bool:
         """Check if a query is an arxiv identifier."""
-        arxiv_identifier_pattern = r"\d{2}(0[1-9]|1[0-2])\.\d{4,5}(v\d+|)|\d{7}.*"
-        for query_item in query[: self.ARXIV_MAX_QUERY_LENGTH].split():
-            match_result = re.match(arxiv_identifier_pattern, query_item)
-            if not match_result:
-                return False
-            assert match_result is not None
-            if not match_result.group(0) == query_item:
-                return False
-        return True
+
+        return is_arxiv_identifier(query[: self.ARXIV_MAX_QUERY_LENGTH])
 
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
@@ -96,7 +91,7 @@ class ArxivAPIWrapper(BaseModel):
             )
         return values
 
-    def get_summaries_as_docs(self, query: str) -> List[Document]:
+    def get_summaries_as_docs(self, query: str, offset: int = 0) -> List[Document]:
         """
         Performs an arxiv search and returns list of
         documents, with summaries as the content.
@@ -113,17 +108,17 @@ class ArxivAPIWrapper(BaseModel):
                 results = self.arxiv_search(
                     id_list=query.split(),
                     max_results=self.top_k_results,
-                ).results()
+                ).results(offset=offset)
             else:
                 results = self.arxiv_search(  # type: ignore
                     query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=self.top_k_results
-                ).results()
+                ).results(offset=offset)
         except self.arxiv_exceptions as ex:
             raise Exception(f"Arxiv exception: {ex}")
 
         return results
 
-    def run(self, query: str) -> str:
+    def run(self, query: str, offset: int = 0) -> str:
         """
         Performs an arxiv search and A single string
         with the publish date, title, authors, and summary
@@ -141,11 +136,11 @@ class ArxivAPIWrapper(BaseModel):
                 results = self.arxiv_search(
                     id_list=query.split(),
                     max_results=self.top_k_results,
-                ).results()
+                ).results(offset)
             else:
                 results = self.arxiv_search(  # type: ignore
                     query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=self.top_k_results
-                ).results()
+                ).results(offset=offset)
         except self.arxiv_exceptions as ex:
             return f"Arxiv exception: {ex}"
         docs = [
@@ -188,11 +183,11 @@ class ArxivAPIWrapper(BaseModel):
                 results = self.arxiv_search(
                     id_list=query[: self.ARXIV_MAX_QUERY_LENGTH].split(),
                     max_results=self.load_max_docs,
-                ).results()
+                ).results(offset=offset)
             else:
                 results = self.arxiv_search(  # type: ignore
                     query[: self.ARXIV_MAX_QUERY_LENGTH], max_results=self.load_max_docs
-                ).results()
+                ).results(offset=offset)
         except self.arxiv_exceptions as ex:
             logger.debug("Error on arxiv: %s", ex)
             return []
