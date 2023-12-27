@@ -1,3 +1,5 @@
+from arxiv_summarizer.exceptions import InvalidArxivId, FalseArxivId, ArxivDocumentWithdrawn
+
 def chunk(content):
     '''We are currently using a manual chunking method that combines 10 sentences at one time.
         Since the model context length is around 512 we are assume that 10 sentences would create a context length of that is between 600+-100
@@ -42,11 +44,10 @@ def doc_loader(search_query):
     '''The purpose of this function is to load the documents from Arxiv'''
     '''We are using the Arxiv Loader under Langchain library, which intern invokes the Arxiv API'''
 
-    try :
-        docs = ArxivLoader(query=search_query, load_max_docs=1).load()
-        return docs[0].metadata, docs[0].page_content
-    except Exception as e:
-        print(e)
+    docs = ArxivLoader(query=search_query, load_max_docs=1).load()
+    if len(docs) == 0:
+        raise FalseArxivId(f"Cannot find the arxiv id `{search_query}`")
+    return docs[0].metadata, docs[0].page_content
 
 import torch
 

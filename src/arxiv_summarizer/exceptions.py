@@ -1,0 +1,9 @@
+class InvalidArxivId(Exception):
+    ...
+
+class FalseArxivId(Exception):
+    ...
+
+class ArxivDocumentWithdrawn(Exception):
+    ...
+
