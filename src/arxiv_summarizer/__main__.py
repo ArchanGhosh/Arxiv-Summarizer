@@ -3,6 +3,7 @@ from rich.console import Console
 from logging import CRITICAL, FATAL, ERROR, WARNING, WARN, INFO, DEBUG
 from transformers.utils import logging
 from arxiv_summarizer.summarizer import ArxivSummarizer, SummarizationModel
+from arxiv_summarizer.fetch_paper import ArxivPaper
 
 logging.set_verbosity(ERROR)
 logger = logging.get_logger(__name__)
@@ -30,15 +31,10 @@ def main(arxiv_id: str, model: str = "Falconsai/text_summarization", tokenizer: 
             as_cli = True,
         )
     )
-    # summarizer = ArxivSummarizer()
-    metadata, data = summarizer(arxiv_id)
+    paper, data = summarizer(arxiv_id)
     
-    # print([len(s[0]['summary_text']) for s in data])
-    # print(metadata)
-    console.print(metadata['Title'], justify = "center")
-    # console.print("[ " + metadata['Published'] + " ]", justify = "center")
-    console.rule(f"[ {metadata['Published']} ]")
-    # console.rule("[bold red]Chapter 2")
+    console.print(paper.name, justify = "center")
+    console.rule(f"[ {paper.published} ]")
     console.print(" ".join([s[0]['summary_text'] for s in data]), justify = "full")
 
 if __name__ == "__main__":
