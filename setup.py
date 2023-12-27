@@ -36,7 +36,7 @@ setup(
     command_options={
         "build_sphinx": {
             "project": ("setup.py", "arxiv-summarizer"),
-            "version": ("setup.py", "0.1.0a"),
+            "version": ("setup.py", "0.1.1a"),
             "release": ("setup.py", "0.1"),
             "source_dir": ("setup.py", "docs"),
         }
