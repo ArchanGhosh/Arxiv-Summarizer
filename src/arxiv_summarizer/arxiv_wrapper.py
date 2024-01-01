@@ -103,6 +103,7 @@ class ArxivAPIWrapper(BaseModel):
 
         Args:
             query: a plaintext search query
+            offset: the offset of the search results
         """  # noqa: E501
         try:
             if self.is_arxiv_identifier(query):
