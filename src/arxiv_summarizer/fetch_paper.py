@@ -1,21 +1,21 @@
+import os
 import warnings
-from dataclasses import dataclass, field
 from datetime import datetime
+from urllib.request import urlretrieve
+from dataclasses import dataclass, field
 from tempfile import NamedTemporaryFile
 from typing import Iterator, List, Tuple
-from urllib.request import urlretrieve
 
 from arxiv.arxiv import Result
-from langchain.document_loaders import ArxivLoader
+# from langchain.document_loaders import ArxivLoader
 
 from arxiv_summarizer.arxiv_wrapper import ArxivAPIWrapper
-from arxiv_summarizer.exceptions import (
-    ArxivDocumentWithdrawn,
-    ArxivQueryReturnedEmpty,
-    FalseArxivId,
-    InvalidArxivId,
-)
-from arxiv_summarizer.utils import is_arxiv_identifier
+# from arxiv_summarizer.exceptions import (
+#     ArxivDocumentWithdrawn,
+#     ArxivQueryReturnedEmpty,
+#     FalseArxivId,
+#     InvalidArxivId,
+# )
 
 
 @dataclass(slots=True)
@@ -36,9 +36,7 @@ class ArxivPaper:
     _content: int = field(repr=False, init=False, default=None)
 
     @property
-    def content(
-        self,
-    ) -> str:
+    def content(self) -> str:
         if self._content:
             return self._content
 
@@ -49,21 +47,18 @@ class ArxivPaper:
                 "PyMuPDF package not found, please install it with "
                 "`pip install pymupdf`"
             )
-
-        with NamedTemporaryFile(
-            mode="r", delete=True, prefix="arxiv_", suffix=".pdf"
-        ) as arxiv_pdf:
-            try:
-                doc_file_name, msg = urlretrieve(self.pdf_url, arxiv_pdf.name)
-                with fitz.open(doc_file_name) as doc_file:
-                    self._content: str = "".join(page.get_text() for page in doc_file)
-            except:
-                warnings.warn(
-                    f"Cannot fetch arxiv:{self.arxiv_id}. Possibly withdrawn."
-                )
-                self._content = None
-                return None
-
+        
+        try:
+            if not self.pdf_url.endswith(".pdf"):
+                self.pdf_url += ".pdf"
+            doc_file_name, msg = urlretrieve(self.pdf_url)
+            with fitz.open(doc_file_name) as doc_file:
+                self._content = "".join(page.get_text() for page in doc_file)
+            os.remove(doc_file_name)
+        except FileNotFoundError as e:
+            print(f"File not found for arxiv:{self.arxiv_id}. Error: {e}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
         return self._content
 
     @staticmethod
@@ -87,7 +82,7 @@ class ArxivPaper:
         return paper
 
 
-def fetch_paper(query, max_docs=1) -> Iterator[ArxivPaper]:
+def fetch_paper(query: str, max_docs=1) -> Iterator[ArxivPaper]:
     """Fetches ArXiv papers based on the given query.
 
     Args:
